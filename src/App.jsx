@@ -112,29 +112,38 @@ const UtahInlineHockeyLeague = () => {
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
-          <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-            <Calendar className="text-blue-600" size={24} />
-          </div>
-          <h3 className="text-lg font-bold text-gray-900 mb-2">Game Day</h3>
-          <p className="text-gray-600">Every Tuesday</p>
-        </div>
-        <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
-          <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4">
-            <Trophy className="text-green-600" size={24} />
-          </div>
-          <h3 className="text-lg font-bold text-gray-900 mb-2">Season</h3>
-          <p className="text-gray-600">Fall/Winter 2025</p>
-        </div>
-        <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
-          <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
-            <Users className="text-purple-600" size={24} />
-          </div>
-          <h3 className="text-lg font-bold text-gray-900 mb-2">Teams</h3>
-          <p className="text-gray-600">{teams.length} Active Teams</p>
-        </div>
-      </div>
+     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+  <div 
+    onClick={() => setActiveTab('schedule')}
+    className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border border-gray-100 cursor-pointer hover:scale-105"
+  >
+    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+      <Calendar className="text-blue-600" size={24} />
+    </div>
+    <h3 className="text-lg font-bold text-gray-900 mb-2">Game Day</h3>
+    <p className="text-gray-600">Every Tuesday</p>
+  </div>
+  <div 
+    onClick={() => setActiveTab('standings')}
+    className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border border-gray-100 cursor-pointer hover:scale-105"
+  >
+    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4">
+      <Trophy className="text-green-600" size={24} />
+    </div>
+    <h3 className="text-lg font-bold text-gray-900 mb-2">Season</h3>
+    <p className="text-gray-600">Fall/Winter 2025</p>
+  </div>
+  <div 
+    onClick={() => setActiveTab('teams')}
+    className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border border-gray-100 cursor-pointer hover:scale-105"
+  >
+    <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
+      <Users className="text-purple-600" size={24} />
+    </div>
+    <h3 className="text-lg font-bold text-gray-900 mb-2">Teams</h3>
+    <p className="text-gray-600">{teams.length} Active Teams</p>
+  </div>
+</div>
 
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
         <div className="px-6 py-5 border-b border-gray-100">
