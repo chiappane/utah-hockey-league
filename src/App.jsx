@@ -404,16 +404,20 @@ export default function App() {
   // RENDER
   // ================================================================
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-black text-white">
-      <header className="bg-black bg-opacity-60 backdrop-blur-lg sticky top-0 z-50 border-b border-white border-opacity-10">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-xl flex items-center justify-center text-4xl font-black shadow-2xl">U</div>
-            <div className="text-4xl font-black">UIHL</div>
-          </div>
-          <div className="text-2xl font-semibold text-yellow-400">{selectedSeason}</div>
-        </div>
-      </header>
+<header className="bg-black bg-opacity-60 backdrop-blur-lg sticky top-0 z-50 border-b border-white border-opacity-10">
+  <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <div className="flex items-center gap-4">
+      {/* YOUR REAL UIHL LOGO */}
+      <img 
+        src="/uihl-logo.png" 
+        alt="UIHL" 
+        className="h-12 md:h-16 lg:h-20 object-contain drop-shadow-2xl"
+      />
+      <div className="text-3xl md:text-5xl font-black hidden lg:block">UIHL</div>
+    </div>
+    <div className="text-xl md:text-2xl font-bold text-yellow-400">{selectedSeason}</div>
+  </div>
+</header>
 
       <nav className="bg-black bg-opacity-50 backdrop-blur border-b border-white border-opacity-10">
         <div className="max-w-7xl mx-auto px-6">
