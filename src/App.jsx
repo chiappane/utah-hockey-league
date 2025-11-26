@@ -3,7 +3,7 @@ import { Calendar, Trophy, Users, Home, ChevronLeft, ChevronDown } from 'lucide-
 
 export default function App() {
   // ================================================================
-  // SEASONS – Summer '25 + Winter '25
+  // SEASONS
   // ================================================================
   const seasons = {
     "Summer '25": {
@@ -36,7 +36,7 @@ export default function App() {
   const currentSeasonName = seasonNames.find(k => seasons[k].current) || seasonNames[0];
 
   // ================================================================
-  // TEAMS & ROSTERS (same for all seasons)
+  // TEAMS & ROSTERS
   // ================================================================
   const teams = [
     { id: 1,  name: 'Salt Lake Sliders' },
@@ -70,6 +70,7 @@ export default function App() {
   const [activeTab, setActiveTab] = React.useState('home');
   const [selectedTeam, setSelectedTeam] = React.useState(null);
   const [selectedSeason, setSelectedSeason] = React.useState(currentSeasonName);
+  const [dropdownOpen, setDropdownOpen] = React.useState(false);
 
   const viewedSeason = seasons[selectedSeason];
   const standings = calculateStandings(viewedSeason);
@@ -120,27 +121,50 @@ export default function App() {
   const getTeamByName = (name) => teams.find(t => t.name === name);
 
   // ================================================================
-  // SEASON DROPDOWN COMPONENT
+  // SEASON DROPDOWN – Click to open/close + click outside to close
   // ================================================================
-  const SeasonDropdown = () => (
-    <div className="relative inline-block">
-      <button className="flex items-center gap-2 px-6 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-xl font-bold text-lg transition">
-        {selectedSeason}
-        <ChevronDown size={20} />
-      </button>
-      <div className="absolute top-full mt-2 left-0 w-full bg-black bg-opacity-90 rounded-xl shadow-2xl overflow-hidden z-50">
-        {seasonNames.map(season => (
-          <button
-            key={season}
-            onClick={() => setSelectedSeason(season)}
-            className={`block w-full text-left px-6 py-3 hover:bg-white hover:bg-opacity-20 transition ${season === selectedSeason ? 'bg-blue-600' : ''}`}
-          >
-            {season} {seasons[season].current && '← Current'}
-          </button>
-        ))}
+  const SeasonDropdown = () => {
+    const dropdownRef = React.useRef(null);
+
+    React.useEffect(() => {
+      const handleClickOutside = (e) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+          setDropdownOpen(false);
+        }
+      };
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    return (
+      <div ref={dropdownRef} className="relative">
+        <button
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+          className="flex items-center gap-2 px-6 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-xl font-bold text-lg transition"
+        >
+          {selectedSeason}
+          <ChevronDown size={20} className={`transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+        </button>
+
+        {dropdownOpen && (
+          <div className="absolute top-full mt-2 left-0 min-w-full bg-black bg-opacity-95 rounded-xl shadow-2xl overflow-hidden z-50 border border-white border-opacity-20">
+            {seasonNames.map(season => (
+              <button
+                key={season}
+                onClick={() => {
+                  setSelectedSeason(season);
+                  setDropdownOpen(false);
+                }}
+                className={`block w-full text-left px-6 py-3 hover:bg-white hover:bg-opacity-20 transition font-medium ${season === selectedSeason ? 'bg-blue-600' : ''}`}
+              >
+                {season} {seasons[season].current && '← Current'}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
-    </div>
-  );
+    );
+  };
 
   // ================================================================
   // TEAM PAGE
@@ -214,7 +238,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Roster Table */}
+        {/* Roster */}
         <div>
           <h2 className="text-3xl font-bold text-white mb-6">Roster</h2>
           <div className="bg-white bg-opacity-10 rounded-2xl overflow-hidden">
@@ -362,7 +386,7 @@ export default function App() {
           <tbody>
             {teams.map((team, i) => (
               <tr key={team.id} className="border-t border-white border-opacity-10 hover:bg-white hover:bg-opacity-5 cursor-pointer"
-                  onClick={() => { setSelectedTeam(team.id); }}>
+                  onClick={() => setSelectedTeam(team.id)}>
                 <td className="px-8 py-6 text-yellow-400 font-bold text-xl">{i + 1}</td>
                 <td className="px-8 py-6 text-white text-xl font-semibold hover:text-blue-400">{team.name}</td>
                 <td className="px-8 py-6 text-center">
@@ -402,7 +426,7 @@ export default function App() {
             ].map(tab => (
               <button
                 key={tab.id}
-                onClick={() => { setActiveTab(tab.id); setSelectedTeam(null); }}
+                onClick={() => { setActiveTab(tab.id); setSelectedTeam(null); setDropdownOpen(false); }}
                 className={`flex items-center gap-3 px-8 py-4 rounded-t-xl font-bold text-lg transition ${
                   activeTab === tab.id ? 'bg-blue-600 text-white' : 'text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-10'
                 }`}
