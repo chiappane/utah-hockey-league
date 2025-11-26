@@ -18,7 +18,7 @@ export default function App() {
   const teams = [
     { id: 1, name: 'Salt Lake Sliders' },
     { id: 2, name: 'Provo Pucksters' },
-    { id: 3, name:name 'Ogden Ice Hawks' },
+    { id: 3, name: 'Ogden Ice Hawks' },
     { id: 4, name: 'Park City Blades' },
   ];
 
