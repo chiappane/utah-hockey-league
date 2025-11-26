@@ -1,109 +1,100 @@
 import React from 'react';
 import { Calendar, Trophy, Users, Home, ChevronRight } from 'lucide-react';
 
-const UtahInlineHockeyLeague = () => {
-  // EDIT SCORES HERE EVERY WEEK – that’s literally all you ever have to do
+export default function App() {
+  // EDIT ONLY THIS ARRAY EVERY WEEK — that’s all you ever have to do!
   const schedule = [
-    // Week 1 – Dec 3
     { date: '2025-12-03', time: '7:00 PM', home: 'Salt Lake Sliders', away: 'Provo Pucksters',   homeScore: 6, awayScore: 4 },
     { date: '2025-12-03', time: '8:30 PM', home: 'Ogden Ice Hawks',   away: 'Park City Blades',   homeScore: 3, awayScore: 3 },
-
-    // Week 2 – Dec 10
     { date: '2025-12-10', time: '7:00 PM', home: 'Provo Pucksters',  away: 'Ogden Ice Hawks',     homeScore: 5, awayScore: 2 },
     { date: '2025-12-10', time: '8:30 PM', home: 'Park City Blades', away: 'Salt Lake Sliders',  homeScore: 1, awayScore: 7 },
-
-    // Future weeks – leave scores as null until played
     { date: '2025-12-17', time: '7:00 PM', home: 'Salt Lake Sliders', away: 'Ogden Ice Hawks',   homeScore: null, awayScore: null },
     { date: '2025-12-17', time: '8:30 PM', home: 'Provo Pucksters',  away: 'Park City Blades', homeScore: null, awayScore: null },
     { date: '2025-12-24', time: '7:00 PM', home: 'Ogden Ice Hawks',   away: 'Salt Lake Sliders', homeScore: null, awayScore: null },
     { date: '2025-12-24', time: '8:30 PM', home: 'Park City Blades', away: 'Provo Pucksters',  homeScore: null, awayScore: null },
+    // Add more weeks here as the season goes
   ];
 
   const teams = [
     { id: 1, name: 'Salt Lake Sliders' },
     { id: 2, name: 'Provo Pucksters' },
-    { id: 3, name: 'Ogden Ice Hawks' },     // ← fixed the typo here
+    { id: 3, name:name 'Ogden Ice Hawks' },
     { id: 4, name: 'Park City Blades' },
   ];
 
-  // Auto-calculate standings & streak
   const calculateStandings = () => {
-    const stats = new Map<string, { wins: number; losses: number; ties: number; last: string[] }>();
+    const stats = new Map();
     teams.forEach(t => stats.set(t.name, { wins: 0, losses: 0, ties: 0, last: [] }));
 
     schedule.forEach(game => {
       if (game.homeScore === null) return;
 
+      const h = game.home;
+      const a = game.away;
+
       if (game.homeScore > game.awayScore) {
-        stats.get(game.home)!.wins++;
-        stats.get(game.away)!.losses++;
-        stats.get(game.home)!.last.push('W');
-        stats.get(game.away)!.last.push('L');
+        stats.get(h).wins++;
+        stats.get(a).losses++;
+        stats.get(h).last.push('W');
+        stats.get(a).last.push('L');
       } else if (game.homeScore < game.awayScore) {
-        stats.get(game.home)!.losses++;
-        stats.get(game.away)!.wins++;
-        stats.get(game.home)!.last.push('L');
-        stats.get(game.away)!.last.push('W');
+        stats.get(h).losses++;
+        stats.get(a).wins++;
+        stats.get(h).last.push('L');
+        stats.get(a).last.push('W');
       } else {
-        stats.get(game.home)!.ties++;
-        stats.get(game.away)!.ties++;
-        stats.get(game.home)!.last.push('T');
-        stats.get(game.away)!.last.push('T');
+        stats.get(h).ties++;
+        stats.get(a).ties++;
+        stats.get(h).last.push('T');
+        stats.get(a).last.push('T');
       }
     });
 
-    return teams
-      .map(team => {
-        const s = stats.get(team.name)!;
-        const points = s.wins * 2 + s.ties;
+    return teams.map(team => {
+      const s = stats.get(team.name);
+      const points = s.wins * 2 + s.ties;
 
-        // Calculate current streak
-        let streak = 0;
-        if (s.last.length > 0) {
-          const lastResult = s.last[s.last.length - 1];
-          if (lastResult !== 'T') {
-            let count = 0;
-            for (let i = s.last.length - 1; i >= 0; i--) {
-              if (s.last[i] === lastResult) count++;
-              else break;
-            }
-            streak = lastResult === 'W' ? count : -count;
+      // Streak
+      let streak = 0;
+      if (s.last.length > 0) {
+        const last = s.last[s.last.length - 1];
+        if (last !== 'T') {
+          let count = 0;
+          for (let i = s.last.length - 1; i >= 0; i--) {
+            if (s.last[i] === last) count++;
+            else break;
           }
+          streak = last === 'W' ? count : -count;
         }
+      }
 
-        return {
-          ...team,
-          wins: s.wins,
-          losses: s.losses,
-          ties: s.ties,
-          points,
-          streak,
-          gp: s.wins + s.losses + s.ties,
-        };
-      })
-      .sort((a, b) => b.points - a.points || b.wins - a.wins);
+      return {
+        ...team,
+        wins: s.wins,
+        losses: s.losses,
+        ties: s.ties,
+        points,
+        streak,
+        gp: s.wins + s.losses + s.ties,
+      };
+    }).sort((a, b) => b.points - a.points || b.wins - a.wins);
   };
 
   const standings = calculateStandings();
-
   const [activeTab, setActiveTab] = React.useState('home');
-  const [selectedTeam, setSelectedTeam] = React.useState<number | null>(null);
+  const [selectedTeam, setSelectedTeam] = React.useState(null);
 
   const tabs = [
-    { id: 'home', label: 'Home', icon: Home },
-    { id: 'schedule', label: 'Schedule', icon: Calendar },
+    { id: 'home',      label: 'Home',      icon: Home },
+    { id: 'schedule',  label: 'Schedule',  icon: Calendar },
     { id: 'standings', label: 'Standings', icon: Trophy },
-    { id: 'teams', label: 'Teams', icon: Users },
+    { id: 'teams',     label: 'Teams',     icon: Users },
   ];
-
-  // ──────────────────────────────────────────────────────────────────────
-  // UI Components (exactly the same beautiful design you already love)
-  // ──────────────────────────────────────────────────────────────────────
 
   const HomePage = () => (
     <div className="max-w-7xl mx-auto">
       <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 rounded-3xl p-12 mb-8 shadow-2xl">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE2YzAtNi42MjcgNS4zNzMtMTIgMTItMTJzMTIgNS4zNzMgMTIgMTItNS4zNzMgMTItMTIgMTItMTItNS4zNzMtMTItMTJ6TTAgMTZjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMi01LjM3MyAxMi0xMiAxMlMwIDIyLjYyNyAwIDE2eiIvPjwvZz48L2c+PC9zdmc+')] opacity-20" />
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE2YzAtNi42MjcgNS4zNzMtMTIgMTItMTJzMTIgNS4zNzMgMTIgMTItNS4zNzMgMTItMTIgMTItMTItNS4zNzMtMTItMTJ6TTAgMTZjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMi01LjM3MyAxMi0xMiAxMlMwIDIyLjYyNyAwIDE2eiIvPjwvZz48L2c+PC9zdmc+')] opacity-20"></div>
         <div className="relative z-10">
           <h1 className="text-5xl md:text-6xl font-black text-white mb-4 tracking-tight">
             Utah Inline Hockey League
@@ -117,11 +108,7 @@ const UtahInlineHockeyLeague = () => {
           Next Game Night:{' '}
           <span className="text-blue-600">
             {schedule.find(g => g.homeScore === null)
-              ? new Date(schedule.find(g => g.homeScore === null)!.date).toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  month: 'long',
-                  day: 'numeric',
-                })
+              ? new Date(schedule.find(g => g.homeScore === null).date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
               : 'Season Complete'}
           </span>
         </p>
@@ -161,7 +148,7 @@ const UtahInlineHockeyLeague = () => {
                 <div key={i} className="flex items-center justify-between py-4 border-b last:border-b-0 border-gray-100">
                   <div className="flex-1 text-right pr-4 font-semibold">{game.home}</div>
                   <div className="px-6">
-                    <div className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-6 py-2 rounded-xl font-bold text-xl shadow-md">
+                    <div className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-6 py- py-2 rounded-xl font-bold text-xl shadow-md">
                       {game.homeScore}–{game.awayScore}
                     </div>
                   </div>
@@ -250,20 +237,112 @@ const UtahInlineHockeyLeague = () => {
     </div>
   );
 
-  const TeamsPage = () => { /* ... same as before ... */ };
+  const TeamsPage = () => {
+    if (selectedTeam !== null) {
+      const team = standings.find(t => t.id === selectedTeam);
+      return (
+        <div className="max-w-5xl mx-auto">
+          <button onClick={() => setSelectedTeam(null)} className="mb-6 text-blue-600 font-semibold flex items-center gap-2">
+            ← Back to Teams
+          </button>
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-8">
+              <h1 className="text-4xl font-bold">{team.name}</h1>
+              <p className="text-blue-200">2025 Season</p>
+            </div>
+            <div className="p-8 grid grid-cols-2 md:grid-cols-4 gap-6">
+              {[
+                { label: 'Wins',   value: team.wins,   color: 'green' },
+                { label: 'Losses', value: team.losses, color: 'red' },
+                { label: 'Ties',   value: team.ties,   color: 'gray' },
+                { label: 'Points', value: team.points, color: 'blue' },
+              ].map(s => (
+                <div key={s.label} className={`text-center p-6 bg-${s.color}-50 rounded-xl border-2 border-${s.color}-200`}>
+                  <div className={`text-4xl font-bold text-${s.color}-700`}>{s.value}</div>
+                  <div className={`text-sm font-semibold text-${s.color}-600`}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-4xl font-bold mb-8 text-gray-900">Teams</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {standings.map(team => (
+            <div
+              key={team.id}
+              onClick={() => setSelectedTeam(team.id)}
+              className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-2xl hover:scale-105 transition cursor-pointer group"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <h2 className="text-xl font-bold group-hover:text-blue-600 transition">{team.name}</h2>
+                <ChevronRight className="text-gray-400 group-hover:text-blue-600" size={20} />
+              </div>
+              <div className="space-y-3">
+                <div className="flex justify-between border-b pb-3">
+                  <span className="text-gray-600">Record</span>
+                  <span className="font-bold">{team.wins}–{team.losses}–{team.ties}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Points</span>
+                  <span className="px-3 py-1 bg-blue-600 text-white rounded-lg font-bold">{team.points}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header & Nav exactly the same as before */}
-      {/* Content */}
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">U</div>
+            <div className="text-2xl font-bold">UIHL</div>
+          </div>
+        </div>
+      </header>
+
+      {/* Navigation */}
+      <nav className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex gap-1 overflow-x-auto">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  setSelectedTeam(null);
+                }}
+                className={`flex items-center gap-2 px-6 py-4 font-semibold whitespace-nowrap transition-all ${
+                  activeTab === tab.id
+                    ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                <tab.icon size={20} />
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-12">
-        {activeTab === 'home' && <Home />}
+        {activeTab === 'home' && <HomePage />}
         {activeTab === 'schedule' && <SchedulePage />}
         {activeTab === 'standings' && <StandingsPage />}
         {activeTab === 'teams' && <TeamsPage />}
       </main>
     </div>
   );
-};
-
-export default UtahInlineHockeyLeague;
+}
