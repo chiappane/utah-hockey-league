@@ -268,26 +268,36 @@ export default function App() {
     </div>
   );
 
-return (
+  return (
     <div className="min-h-screen bg-black text-white relative overflow-x-hidden">
-      {/* PERFECT LOGO BACKGROUND */}
-      <div className="fixed inset-0 -z-10 pointer-events-none">
-        <img 
-          src="/uihl-logo.png" 
-          alt="UIHL Background" 
-          className="w-full h-full object-contain object-center opacity-30 md:opacity-40 scale-75 md:scale-100"
-        />
+      {/* SUBTLE LOGO BACKGROUND */}
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-5">
+        <img src="/uihl-logo.png" alt="" className="w-full h-full object-cover object-center" />
       </div>
-      <div className="fixed inset-0 -z-10 bg-black/40 pointer-events-none" />
+      <div className="fixed inset-0 bg-gradient-to-br from-black via-blue-950/90 to-black z-0" />
 
       <div className="relative z-10">
-        {/* Your existing header, nav, and main content — unchanged */}
-        <header className="bg-black/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-40">
-          {/* ... your header ... */}
+        <header className="bg-black/70 backdrop-blur-xl border-b border-white/10 sticky top-0 z-40">
+          <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <img src="/uihl-logo.png" alt="UIHL" className="h-10 md:h-14 object-contain drop-shadow-2xl" />
+              <span className="text-2xl md:text-4xl font-black hidden sm:block">UIHL</span>
+            </div>
+            <div className="text-lg md:text-2xl font-bold text-yellow-400">{selectedSeason}</div>
+          </div>
         </header>
+
         <nav className="bg-black/60 backdrop-blur border-b border-white/10 sticky top-16 z-30">
-          {/* ... your nav ... */}
+          <div className="flex gap-2 overflow-x-auto px-3 py-3 scrollbar-hide">
+            {[{id:'home',label:'Home',icon:Home},{id:'schedule',label:'Schedule',icon:Calendar},{id:'standings',label:'Standings',icon:Trophy},{id:'teams',label:'Teams',icon:Users}].map(t => (
+              <button key={t.id} onClick={() => { setActiveTab(t.id); setSelectedTeam(null); setDropdownOpen(false); }}
+                className={`flex items-center gap-2 px-5 py-3 rounded-lg font-bold text-sm whitespace-nowrap transition ${activeTab===t.id?'bg-blue-600':'text-gray-300 hover:bg-white/10'}`}>
+                <t.icon size={20} /> {t.label}
+              </button>
+            ))}
+          </div>
         </nav>
+
         <main className="max-w-7xl mx-auto px-4 py-8 pb-24">
           {activeTab === 'home' && <HomePage />}
           {activeTab === 'schedule' && <SchedulePage />}
