@@ -1,13 +1,9 @@
-jsx// src/App.jsx
-// FULL FINAL VERSION – 10 teams, rosters, multi-season support, Winter '25 title
-// Just copy-paste this entire file over your current src/App.jsx and push to Netlify
-
 import React from 'react';
 import { Calendar, Trophy, Users, Home, ChevronRight, ChevronLeft } from 'lucide-react';
 
 export default function App() {
   // ================================================================
-  // SEASONS – Add a new object here every season (only ONE has current: true)
+  // SEASONS
   // ================================================================
   const seasons = {
     "Winter '25": {
@@ -17,31 +13,23 @@ export default function App() {
         { date: '2025-12-03', time: '8:30 PM', home: 'Ogden Ice Hawks',      away: 'Park City Blades',      homeScore: 3, awayScore: 3 },
         { date: '2025-12-10', time: '7:00 PM', home: 'Provo Pucksters',      away: 'Ogden Ice Hawks',       homeScore: 5, awayScore: 2 },
         { date: '2025-12-10', time: '8:30 PM', home: 'Park City Blades',     away: 'Salt Lake Sliders',     homeScore: 1, awayScore: 7 },
-        // ← Add games here every week. Use null for upcoming games
         { date: '2025-12-17', time: '7:00 PM', home: 'Lehi Lightning',       away: 'Layton Lancers',        homeScore: null, awayScore: null },
         { date: '2025-12-17', time: '8:30 PM', home: 'Orem Outlaws',         away: 'Logan Wolves',          homeScore: null, awayScore: null },
-        // …keep going
       ],
     },
-    // Example of a finished season (you will add these later)
-    // "Fall '24": {
-    //   current: false,
-    //   schedule: [ …old games with real scores… ],
-    // },
   };
 
-  // Automatically pick the current season
   const currentSeasonName = Object.keys(seasons).find(k => seasons[k].current) || Object.keys(seasons)[0];
   const currentSeason = seasons[currentSeasonName];
 
   // ================================================================
-  // 10 TEAMS
+  // 10 TEAMS + ROSTERS
   // ================================================================
   const teams = [
     { id: 1,  name: 'Salt Lake Sliders',    color: 'blue'   },
     { id: 2,  name: 'Provo Pucksters',      color: 'purple' },
     { id: 3,  name: 'Ogden Ice Hawks',      color: 'black'  },
-    { id: 4,  name: 'Park City Blades',    color: 'silver' },
+    { id: 4,  name: 'Park City Blades',     color: 'silver' },
     { id: 5,  name: 'Lehi Lightning',       color: 'yellow' },
     { id: 6,  name: 'Layton Lancers',       color: 'green'  },
     { id: 7,  name: 'Orem Outlaws',         color: 'red'    },
@@ -50,9 +38,6 @@ export default function App() {
     { id: 10, name: 'Cedar City Crushers',  color: 'maroon' },
   ];
 
-  // ================================================================
-  // ROSTERS – 5 players per team (last one is the goalie)
-  // ================================================================
   const rosters = {
     'Salt Lake Sliders':     ['Jake Thompson', 'Mike Rivera', 'Alex Chen', 'Sarah Kim', 'Tyler Brooks (G)'],
     'Provo Pucksters':       ['Connor Davis', 'Liam Wright', 'Noah Patel', 'Emma Johnson', 'Carter Hayes (G)'],
@@ -67,7 +52,7 @@ export default function App() {
   };
 
   // ================================================================
-  // CALCULATE STANDINGS FOR ANY SEASON
+  // CALCULATE STANDINGS (fixed the typo that caused white screen)
   // ================================================================
   const calculateStandings = (seasonData) => {
     const stats = new Map();
@@ -109,7 +94,7 @@ export default function App() {
           streak = last === 'W' ? count : -count;
         }
       }
-      return { ...team, ...s, points, streak, gp: s.wins + s.losses + s.ties };
+      return { ...team, wins: s.wins, losses: s.losses, ties: s.ties, points, streak, gp: s.wins + s.losses + s.ties };
     }).sort((a, b) => b.points - a.points || b.wins - a.wins);
   };
 
@@ -118,8 +103,7 @@ export default function App() {
   const [selectedTeam, setSelectedTeam] = React.useState(null);
   const [selectedSeason, setSelectedSeason] = React.useState(currentSeasonName);
 
-  // Standings for the season the user is viewing
-  const viewedSeason = seasons[selectedSeason];
+  const viewedSeason = seasons[selectedSeason] || currentSeason;
   const standings = calculateStandings(viewedSeason);
 
   const tabs = [
@@ -130,20 +114,13 @@ export default function App() {
   ];
 
   // ================================================================
-  // COMPONENTS
+  // PAGES
   // ================================================================
   const HomePage = () => (
-    <div className="max-w-7xl mx-auto text-center py-24">
-      <h1 className="text-5xl md:text-7xl font-black text-white mb-6">Utah Inline Hockey League</h1>
-      <p className="text-2xl md:text-3xl text-blue-200 mb-12">Winter ’25 Season • 10 Teams • Pure Fun</p>
-      <div className="text-3xl md:text-4xl font-bold text-yellow-400">
-        Next Games:{' '}
-        {viewedSeason.schedule.find(g => g.homeScore === null)
-          ? new Date(viewedSeason.schedule.find(g => g.homeScore === null).date).toLocaleDateString('en-US', {
-              weekday: 'long', month: 'long', day: 'numeric'
-            })
-          : 'Season Complete'}
-      </div>
+    <div className="text-center py-24">
+      <h1 className="text-6xl md:text-8xl font-black text-white mb-6">UIHL</h1>
+      <p className="text-3xl text-blue-300 mb-8">Utah Inline Hockey League</p>
+      <p className="text-2xl text-yellow-400">Winter '25 Season • 10 Teams</p>
     </div>
   );
 
@@ -154,25 +131,22 @@ export default function App() {
         {viewedSeason.schedule.map((game, i) => {
           const played = game.homeScore !== null;
           return (
-            <div key={i} className="bg-white/10 backdrop-blur rounded-2xl p-6 hover:bg-white/20 transition">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div key={i} className="bg-white bg-opacity-10 rounded-2xl p-6 backdrop-blur">
+              <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
-                  <div className="text-sm font-semibold text-blue-300 mb-2">
+                  <div className="text-blue-300 font-semibold">
                     {new Date(game.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} • {game.time}
                   </div>
-                  <div className="text-xl font-bold text-white">
-                    {game.home} <span className="text-gray-400">vs</span> {game.away}
+                  <div className="text-2xl font-bold text-white mt-2">
+                    {game.home} vs {game.away}
                   </div>
                 </div>
                 {played ? (
-                  <div className="flex items-center gap-6">
-                    <span className="px-4 py-2 bg-green-600 text-white rounded-lg font-bold">FINAL</span>
-                    <div className="text-4xl font-black text-yellow-400">{game.homeScore}–{game.awayScore}</div>
+                  <div className="text-4xl font-black text-yellow-400">
+                    {game.homeScore}–{game.awayScore}
                   </div>
                 ) : (
-                  <div className="px-8 py-4 bg-yellow-600 text-black rounded-xl font-bold text-lg">
-                    Upcoming
-                  </div>
+                  <span className="px-6 py-3 bg-yellow-600 text-black rounded-xl font-bold">UPCOMING</span>
                 )}
               </div>
             </div>
@@ -184,52 +158,45 @@ export default function App() {
 
   const StandingsPage = () => (
     <div className="max-w-6xl mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-bold text-white">League Standings – {selectedSeason}</h1>
-        <select
-          value={selectedSeason}
-          onChange={(e) => setSelectedSeason(e.target.value)}
-          className="px-5 py-3 bg-white/20 backdrop-blur text-white rounded-lg border border-white/30"
-        >
-          {Object.keys(seasons).map(s => (
-            <option key={s} value={s} className="bg-gray-900">{s}</option>
-          ))}
+        <select value={selectedSeason} onChange={e => setSelectedSeason(e.target.value)}
+          className="px-4 py-2 bg-white text-black rounded-lg">
+          {Object.keys(seasons).map(s => <option key={s} value={s}>{s}</option>)}
         </select>
       </div>
 
-      <div className="bg-white/10 backdrop-blur rounded-2xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-white/20">
-              <tr>
-                <th className="px-6 py-4 text-left text-white">Rank</th>
-                <th className="px-6 py-4 text-left text-white">Team</th>
-                <th className="px-6 py-4 text-center text-white">GP</th>
-                <th className="px-6 py-4 text-center text-white">W</th>
-                <th className="px-6 py-4 text-center text-white">L</th>
-                <th className="px-6 py-4 text-center text-white">T</th>
-                <th className="px-6 py-4 text-center text-white">PTS</th>
-                <th className="px-6 py-4 text-center text-white">Streak</th>
+      <div className="bg-white bg-opacity-10 rounded-2xl overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-white bg-opacity-20">
+            <tr>
+              <th className="px-6 py-4 text-left">Rank</th>
+              <th className="px-6 py-4 text-left">Team</th>
+              <th className="px-6 py-4 text-center">GP</th>
+              <th className="px-6 py-4 text-center">W</th>
+              <th className="px-6 py-4 text-center">L</th>
+              <th className="px-6 py-4 text-center">T</th>
+              <th className="px-6 py-4 text-center">PTS</th>
+              <th className="px-6 py-4 text-center">Streak</th>
+            </tr>
+          </thead>
+          <tbody>
+            {standings.map((team, i) => (
+              <tr key={team.id} className="border-t border-white border-opacity-10">
+                <td className="px-6 py-4">{i + 1}</td>
+                <td className="px-6 py-4 font-bold">{team.name}</td>
+                <td className="px-6 py-4 text-center">{team.gp}</td>
+                <td className="px-6 py-4 text-center"><span className="px-3 py-1 bg-green-600 rounded-lg">{team.wins}</span></td>
+                <td className="px-6 py-4 text-center"><span className="px-3 py-1 bg-red-600 rounded-lg">{team.losses}</span></td>
+                <td className="px-6 py-4 text-center"><span className="px-3 py-1 bg-gray-600 rounded-lg">{team.ties}</span></td>
+                <td className="px-6 py-4 text-center"><span className="px-4 py-2 bg-yellow-500 text-black font-bold rounded-lg">{team.points}</span></td>
+                <td className="px-6 py-4 text-center font-bold">
+                  {team.streak > 0 ? `W${team.streak}` : team.streak < 0 ? `L${Math.abs(team.streak)}` : '–'}
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {standings.map((team, i) => (
-                <tr key={team.id} className="border-t border-white/10 hover:bg-white/5">
-                  <td className="px-6 py-5 text-white">{i + 1}</td>
-                  <td className="px-6 py-5 font-bold text-white">{team.name}</td>
-                  <td className="px-6 py-5 text-center text-gray-300">{team.gp}</td>
-                  <td className="px-6 py-5 text-center"><span className="px-3 py-1 bg-green-600 text-white rounded-lg font-bold">{team.wins}</span></td>
-                  <td className="px-6 py-5 text-center"><span className="px-3 py-1 bg-red-600 text-white rounded-lg font-bold">{team.losses}</span></td>
-                  <td className="px-6 py-5 text-center"><span className="px-3 py-1 bg-gray-600 text-white rounded-lg font-bold">{team.ties}</span></td>
-                  <td className="px-6 py-5 text-center"><span className="px-4 py-2 bg-yellow-500 text-black rounded-lg font-black text-lg">{team.points}</span></td>
-                  <td className="px-6 py-5 text-center font-bold">
-                    {team.streak > 0 ? <span className="text-green-400">W{team.streak}</span> : team.streak < 0 ? <span className="text-red-400">L{Math.abs(team.streak)}</span> : '–'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -240,27 +207,22 @@ export default function App() {
       const roster = rosters[team.name] || [];
       return (
         <div className="max-w-4xl mx-auto">
-          <button onClick={() => setSelectedTeam(null)} className="mb-6 text-blue-300 flex items-center gap-2 hover:text-white">
-            <ChevronLeft size={20} /> Back to Teams
+          <button onClick={() => setSelectedTeam(null)} className="mb-6 text-blue-400 flex items-center gap-2">
+            <ChevronLeft /> Back
           </button>
-          <div className="bg-white/10 backdrop-blur rounded-3xl overflow-hidden">
-            <div className="bg-gradient-to-r from-slate-800 to-blue-900 p-10 text-center">
-              <h1 className="text-5xl font-black text-white">{team.name}</h1>
-              <p className="text-xl text-blue-200 mt-3">{selectedSeason} Roster</p>
-            </div>
-            <div className="p-8">
-              <h2 className="text-3xl font-bold text-white mb-8">Players (5)</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {roster.map((player, i) => {
-                  const isGoalie = player.includes('(G)');
-                  return (
-                    <div key={i} className={`p-6 rounded-2xl border-2 ${isGoalie ? 'border-yellow-500 bg-yellow-900/30' : 'border-white/20'} backdrop-blur`}>
-                      <div className="text-xl font-bold text-white">{player.replace(' (G)', '')}</div>
-                      {isGoalie && <div className="mt-2 px-4 py-1 bg-yellow-500 text-black rounded-full inline-block font-bold">GOALIE</div>}
-                    </div>
-                  );
-                })}
-              </div>
+          <div className="bg-white bg-opacity-10 rounded-3xl p-10">
+            <h1 className="text-5xl font-black text-white mb-4">{team.name}</h1>
+            <p className="text-2xl text-blue-300 mb-10">{selectedSeason} Roster</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {roster.map((player, i) => {
+                const isGoalie = player.includes('(G)');
+                return (
+                  <div key={i} className={`p-6 rounded-2xl ${isGoalie ? 'bg-yellow-900 bg-opacity-30 border-2 border-yellow-500' : 'bg-white bg-opacity-10'} `}>
+                    <div className="text-xl font-bold text-white">{player.replace(' (G)', '')}</div>
+                    {isGoalie && <div className="mt-2 text-yellow-400 font-bold text-lg">GOALIE</div>}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -269,15 +231,12 @@ export default function App() {
 
     return (
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-white">Teams – {selectedSeason}</h1>
+        <h1 className="text-4xl font-bold mb-10 text-white">Teams – {selectedSeason}</h1>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
           {teams.map(team => (
-            <div
-              key={team.id}
-              onClick={() => setSelectedTeam(team.id)}
-              className="bg-white/10 backdrop-blur rounded-2xl p-8 text-center cursor-pointer hover:scale-105 hover:bg-white/20 transition"
-            >
-              <div className={`w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-${team.color}-600 to-${team.color}-800 text-white flex items-center justify-center text-4xl font-black mb-4 shadow-xl`}>
+            <div key={team.id} onClick={() => setSelectedTeam(team.id)}
+              className="bg-white bg-opacity-10 rounded-2xl p-8 text-center cursor-pointer hover:scale-105 transition">
+              <div className={`w-24 h-24 mx-auto rounded-full bg-${team.color}-600 text-white flex items-center justify-center text-3xl font-black mb-4`}>
                 {team.name.split(' ').map(w => w[0]).join('')}
               </div>
               <h3 className="text-xl font-bold text-white">{team.name}</h3>
@@ -289,38 +248,26 @@ export default function App() {
   };
 
   // ================================================================
-  // MAIN RENDER
+  // RENDER
   // ================================================================
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-black text-white">
-      {/* Header */}
-      <header className="bg-black/50 backdrop-blur border-b border-white/10 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <header className="bg-black bg-opacity-50 backdrop-blur sticky top-0 z-50 border-b border-white border-opacity-10">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center text-2xl font-black">U</div>
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center text-3xl font-black">U</div>
             <div className="text-3xl font-bold">UIHL</div>
           </div>
-          <div className="text-xl opacity-80">{selectedSeason}</div>
+          <div className="text-xl opacity-90">{selectedSeason}</div>
         </div>
       </header>
 
-      {/* Navigation */}
-      <nav className="bg-black/70 backdrop-blur border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex gap-1 overflow-x-auto py-2">
+      <nav className="bg-black bg-opacity-70 backdrop-blur border-b border-white border-opacity-10">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex gap-2 overflow-x-auto">
             {tabs.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => {
-                  setActiveTab(tab.id);
-                  setSelectedTeam(null);
-                }}
-                className={`flex items-center gap-3 px-8 py-4 font-semibold rounded-t-lg transition ${
-                  activeTab === tab.id
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:text-white hover:bg-white/10'
-                }`}
-              >
+              <button key={tab.id} onClick={() => { setActiveTab(tab.id); setSelectedTeam(null); }}
+                className={`flex items-center gap-3 px-8 py-4 font-semibold transition ${activeTab === tab.id ? 'bg-blue-600' : 'hover:bg-white hover:bg-opacity-10'}`}>
                 <tab.icon size={22} />
                 {tab.label}
               </button>
@@ -329,8 +276,7 @@ export default function App() {
         </div>
       </nav>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-12">
+      <main className="max-w-7xl mx-auto px-6 py-12">
         {activeTab === 'home' && <HomePage />}
         {activeTab === 'schedule' && <SchedulePage />}
         {activeTab === 'standings' && <StandingsPage />}
